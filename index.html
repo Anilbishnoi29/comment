@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://apis.google.com/js/api.js" defer></script>
+    <script src="app.js" defer></script>
+    <title>comment</title>
+</head>
+
+<body>
+    <div class="container">
+        <div id="idComment">
+            <div class="post">
+                <div class="d-flex">
+                    <h1 class="dp">
+                        <img src="https://randomuser.me/api/portraits/med/men/22.jpg" width="40px" height="auto" alt="">
+                    </h1>
+                    <div class="d-flex column">
+                        <span id="repliedON"></span>
+                        <p><a href="#">e9sfL</a>
+                            <span>Animals are such agreeable friends - they ask no questions; they pass no
+                                criticisms.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="footerComment">
+                <a href="#" id="likeMain">Like</a>
+                <a href="#" id="replyMain">Reply</a>
+                <a href="#" id="shareMain">Share</a>
+            </div>
+            <div class="mainCommentInput">
+                <textarea name="text" id="mainComment" width="100%" rows="3" required no-resize></textarea>
+                <a href="#" id="mainCommentBtn">Submit</a>
+            </div>
+        </div>
+        <div id="childComment"> </div>
+    </div>
+</body>
+
+</html>
