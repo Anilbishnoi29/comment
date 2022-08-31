@@ -1,16 +1,12 @@
 // arr for store comment
 let localComment = [];
-if (JSON.parse(localStorage.getItem("comment"))) {
-    localComment.push(JSON.parse(localStorage.getItem("comment")));
-}
-
-console.log();
+if (JSON.parse(localStorage.getItem("comment"))) localComment.push(JSON.parse(localStorage.getItem("comment")));
 const emojiArr = ['👍️','🔥','😆','😂','😍','👌','😎']; //emoji for likes
-// copy deep copy of localStorage to commentList
+// deep copy of localStorage to commentList
 function createDeepCopy(input) {
     // base condition
     if (typeof input !== "object") return input;
-    // BASE CASE when input is of instance Date
+    // base CASE when input is of instance Date
     if (input instanceof Date) return new Date(input.getTime());
     // copy
     let copy = Array.isArray(input) ? [] : {};
@@ -19,7 +15,6 @@ function createDeepCopy(input) {
 }
 //comment List (array) 
 const commentList = (localComment.length > 0) ? createDeepCopy(JSON.parse(localStorage.getItem("comment"))) : [];
-
 let isMainComment = true;
 let commentID,childCommentContent,childParentID; // global variable for replay
 
@@ -51,18 +46,18 @@ document.querySelector('#mainCommentBtn').addEventListener('click',e => {
 function randomID() { return Math.trunc(Math.random() * 10000000); };
 // create a user name
 function getUserName() {
-    let text = "";
-    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let text = "",possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     for (let i = 0; i < 5; i++)text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
 }
-
 // create comment
 function createComment(id,content,parentID,type) {
+    // api for profile image
     fetch('https://randomuser.me/api/')
         .then(res => res.json())
         .then(data => makeReadyComment(id,content,parentID,type,(data.results[0].picture.medium)));
     function makeReadyComment(id,content,parentID,type,imageURL) {
+        // an obj to store comment data
         const comment = {
             id,
             parentID,
@@ -81,31 +76,28 @@ function createComment(id,content,parentID,type) {
         localStorage.setItem("comment",JSON.stringify(commentList));
         renderComment();
     };
-
 }
 // render comment
 renderComment();
 function renderComment() {
-    document.querySelector('#childComment').innerHTML = '';
     let list = '';
+    document.querySelector('#childComment').innerHTML = '';
     commentList.forEach(comment => (comment.type === 'parent') ? list += nestedComment(comment) : false);
     document.querySelector('#childComment').innerHTML += list;
 }
-
 // render nested comment
 function nestedComment(childComment,replyUserName = null) {
     let time = Math.trunc((Math.floor((new Date() - Date.parse(childComment.time)) / 1000 / 60)));
     let list = `<li id='${childComment.id}' parentID='${childComment.parentID}'>
                 <div class='d-flex'>
-                <h1 class='dp'>
-                    <img src='${childComment.imageURL}' width='40px' height='auto' alt=''>
-                </h1>
+                <h1 class='dp'><img src='${childComment.imageURL}' width='40px' height='auto' alt=''></h1>
                 <div class='d-flex column'>
                     <span id='repliedON'>${(replyUserName === null) ? "" : `@replied on<a href="#">${replyUserName}</a>`}</span>
                 <p><a href="#">${childComment.userName}</a> ${childComment.content}</p>
                 <span id='totalLikes'>${(childComment.totalLikes === 0) ? "" : `<a href="#">${childComment.totalLikes} ${childComment.like[0]}</a>`}</span>
                 <div class='d-flex flex-sb'>
-                <span class='time'>${time < 60 ? time + ' MINUTES ' : Math.trunc(time / 60) + ' HOURS '}AGO</span >
+                <span class='time'>
+                ${time < 60 ? time + ' MINUTES ' : (Math.trunc(time / 60) < 23.59) ? Math.trunc(time / 60) + ' HOURS ' : Math.trunc(time / 60 / 24) + ' DAYS '} AGO</span>
                 <div class='d-flex'><a role="button" class="like-post" id="like-${childComment.id}">
                 <div class="like-empji">`;
 
@@ -128,6 +120,7 @@ function nestedComment(childComment,replyUserName = null) {
         });
         list += `</ul>`;
     }
+
     list += `</li>`;
     return list;
 }
@@ -140,8 +133,7 @@ function commentTask(e) {
     if (type === 'reply') {
         document.querySelector(".mainCommentInput").style.display = "flex";
         document.querySelector('#mainComment').focus();
-        // global variable update for replay 
-        isMainComment = false;
+        isMainComment = false;// global variable update for replay 
         commentID = randomID();
         childParentID = +id;
     } else if (type === 'emoji') {
@@ -154,28 +146,16 @@ function commentTask(e) {
                 localStorage.setItem("comment",JSON.stringify(commentList));
             }
         });
-    } else if (type === 'delete') {
-        let parentID = e.target.getAttribute('parentID');
-        deleteComment(+id);
-    } else {
-        e.target.removeEventListener('click',commentTask);
-    }
+    } else (type === 'delete') ? deleteComment(+id) : e.target.removeEventListener('click',commentTask);
     renderComment(); // render 
 };
-
 // delete comment
 function deleteComment(id) {
-
     commentList.forEach((element,index) => {
         if (element.id === id) {
-            if (element.childIDs > 0) {
-                element.childIDs.forEach(item => {
-                    deleteComment(item);
-                });
-            }
+            if (element.childIDs > 0) element.childIDs.forEach(item => deleteComment(item));
             commentList.splice(index,1);
         }
         localStorage.setItem("comment",JSON.stringify(commentList));
     });
-
 }
